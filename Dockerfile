@@ -13,9 +13,11 @@ RUN apt-get update && \
 # Install tzdata and locales
 RUN apt-get install tzdata locales
 
+ARG timezone="America/Los_Angeles"
+
 # Set the timezone
-RUN echo "America/Los_Angeles" | tee /etc/timezone && \
-    ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
+RUN echo $timezone | tee /etc/timezone && \
+    ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
 # Set the locale for UTF-8 support
