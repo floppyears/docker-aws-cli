@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
-MAINTAINER Fabian Stäber, fabian@fstab.de
+MAINTAINER Jared Kosanovic, kosanovj@oregonstate.edu
 
-ENV LAST_UPDATE=2016-08-21
+ENV LAST_UPDATE=2017-04-27
 
 #####################################################################################
 # Current version is aws-cli/1.10.53 Python/2.7.12
@@ -10,9 +10,14 @@ ENV LAST_UPDATE=2016-08-21
 RUN apt-get update && \
     apt-get upgrade -y
 
+# Install tzdata and locales
+RUN apt-get install tzdata locales
+
+ARG timezone="America/Los_Angeles"
+
 # Set the timezone
-RUN echo "Europe/Berlin" | tee /etc/timezone && \
-    ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
+RUN echo $timezone | tee /etc/timezone && \
+    ln -fs /usr/share/zoneinfo/${timezone} /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
 # Set the locale for UTF-8 support
@@ -51,16 +56,3 @@ RUN \
     ./aws/env/bin/pip install awscli && \
     echo 'source $HOME/aws/env/bin/activate' >> .bashrc && \
     echo 'complete -C aws_completer aws' >> .bashrc
-
-USER root
-
-RUN mkdir examples
-ADD examples/etag.sh /home/aws/examples/etag.sh
-ADD examples/s3diff.sh /home/aws/examples/s3diff.sh
-ADD examples/start.sh /home/aws/examples/start.sh
-ADD examples/terminate.sh /home/aws/examples/terminate.sh
-ADD examples/init-instance.script /home/aws/examples/init-instance.script
-ADD examples/README.md /home/aws/examples/README.md
-RUN chown -R aws:aws /home/aws/examples
-
-USER aws
